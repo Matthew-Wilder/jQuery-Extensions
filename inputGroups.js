@@ -37,7 +37,10 @@ $.fn.repeatedFormAsObject = function(repeatedDataTuples) {
         const endingInput = tuple.endInput;
         const arrayName = tuple.groupName;
         groups[arrayName] = [];
-        const startSearchIndex = findFirstPropertyValuePair(formData, "name", repeatedInput) || size+1;
+        const propertyIndex = findFirstPropertyValuePair(formData, "name", repeatedInput);
+        const startSearchIndex = (propertyIndex === false)
+                ? (size + 1)
+                : propertyIndex;
         const endSearchIndex = (endingInput === undefined) ? size : findFirstPropertyValuePair(formData, "name", endingInput);
         for (let i = startSearchIndex; i < endSearchIndex; ++i) {
             const inputName = formData[i].name;
