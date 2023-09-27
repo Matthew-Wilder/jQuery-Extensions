@@ -27,7 +27,14 @@ function findFirstPropertyValuePair(arrayOfObjects, propertyName, desiredValue, 
  */
 $.fn.repeatedFormAsObject = function(repeatedDataTuples) {
     // First find the names that are duplicated
-    let formData = this.serializeArray();
+    let formData = [];
+    // Iterate through the form elements
+    this.find('[name]').each(function () {
+        const inputName = this.name;
+        const inputValue = $(this).val();
+        formData.push({name: inputName, value: inputValue});
+    });
+
     let size = formData.length;
     let groups = {} // keys are repeated input, value is array of groups
     let repeatedInputSet = new Set();
@@ -53,6 +60,7 @@ $.fn.repeatedFormAsObject = function(repeatedDataTuples) {
             repeatedInputSet.add(inputName);
         }
     }
+
 
     let singletons = {};
     formData.forEach((formObject,i,a) => {
