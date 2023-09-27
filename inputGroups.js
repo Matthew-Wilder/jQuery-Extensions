@@ -13,15 +13,41 @@ function findFirstPropertyValuePair(arrayOfObjects, propertyName, desiredValue, 
         }
 
     }
-    return false;
+    return undefined;
+}
+
+function findLastPropertyValuePair(arrayOfObjects, propertyName, desiredValue, strictEquality=true) {
+    const size = arrayOfObjects.length;
+    for (let i = size - 1; i >= 0; --i) {
+        const obj = arrayOfObjects[i];
+        if (strictEquality) {
+            if (obj[propertyName] === desiredValue) {
+                return parseInt(i);
+            }
+        }
+        else {
+            if (obj[propertyName] == desiredValue) {
+                return parseInt(i);
+            }
+        }
+    }
+    return undefined;
+}
+
+function __get_value_or_default__(valueToTest, defaultValue) {
+    if (valueToTest === undefined) {
+        return defaultValue;
+    } else {
+        return valueToTest;
+    }
 }
 
 /**
  *
  * @param repeatedDataTuples an array of tuple objects. Each should contain the following properties.
- * <br>startInput: name of the form input to start grouping from
- * <br>endInput: (optional) name of the form input where grouping should stop. If not provided, goes till the end of the form.
- * <br>groupName: what to name the resulting property (which holds an array of grouped inputs)
+ * <br>start- String: [name] of the form input to start grouping from
+ * <br>end - String: [name] of the form input where grouping should stop. If not provided, goes till the end of the form.
+ * <br>resultingListName: what to name the resulting property (which holds an array of grouped inputs)
  * <br>list order matters.
  * @returns {{}}
  */
@@ -40,15 +66,14 @@ $.fn.repeatedFormAsObject = function(repeatedDataTuples) {
     let repeatedInputSet = new Set();
     for (const tupleIndex in repeatedDataTuples) {
         const tuple = repeatedDataTuples[tupleIndex];
-        const repeatedInput = tuple.startInput;
-        const endingInput = tuple.endInput;
-        const arrayName = tuple.groupName;
+        const repeatedInput = tuple.start;
+        const endingInput = tuple.end;
+        const arrayName = tuple.resultingListName;
         groups[arrayName] = [];
-        const propertyIndex = findFirstPropertyValuePair(formData, "name", repeatedInput);
-        const startSearchIndex = (propertyIndex === false)
-                ? (size + 1)
-                : propertyIndex;
-        const endSearchIndex = (endingInput === undefined) ? size : findFirstPropertyValuePair(formData, "name", endingInput);
+        
+        const startSearchIndex = __get_value_or_default__(findFirstPropertyValuePair(formData, "name", repeatedInput), (size+1));
+        const endSearchIndex = __get_value_or_default__(findLastPropertyValuePair(formData, "name", endingInput), size);
+
         for (let i = startSearchIndex; i < endSearchIndex; ++i) {
             const inputName = formData[i].name;
             const inputValue = formData[i].value;
